@@ -351,10 +351,15 @@ export class SignInStore extends TypedBaseStore<SignInState | null> {
         )
         this.setState({ ...currentState, loading: false })
       } else if (response.kind === AuthorizationResponseKind.Failed) {
+        const wasEmailEntered = username.includes('@')
         this.setState({
           ...currentState,
           loading: false,
-          error: new Error('Incorrect username/email or password.'),
+          error: new Error(
+            wasEmailEntered
+              ? 'Incorrect email or password.'
+              : 'Incorrect username or password.'
+          ),
         })
       } else if (
         response.kind === AuthorizationResponseKind.UserRequiresVerification
