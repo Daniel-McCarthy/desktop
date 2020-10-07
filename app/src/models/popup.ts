@@ -68,6 +68,7 @@ export enum PopupType {
   RebaseConflicts,
   ChooseForkSettings,
   ConfirmDiscardSelection,
+  ShowOverSizedFiles,
 }
 
 export type Popup =
@@ -259,4 +260,8 @@ export type Popup =
   | {
       type: PopupType.ChooseForkSettings
       repository: RepositoryWithForkedGitHubRepository
+    }
+  | {
+      type: PopupType.ShowOverSizedFiles
+      oversizedFilePaths: ReadonlyArray<string>
     }

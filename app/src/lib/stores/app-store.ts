@@ -158,6 +158,7 @@ import {
   GitError,
 } from '../git'
 import {
+  filesNotTrackedByLFS,
   installGlobalLFSFilters,
   installLFSHooks,
   isUsingLFS,
@@ -269,6 +270,7 @@ import { createTutorialRepository } from './helpers/create-tutorial-repository'
 import { sendNonFatalException } from '../helpers/non-fatal-exception'
 import { getDefaultDir } from '../../ui/lib/default-dir'
 import { WorkflowPreferences } from '../../models/workflow-preferences'
+import { getLargeFilePaths } from '../../lib/large-files'
 
 const LastSelectedRepositoryIDKey = 'last-selected-repository-id'
 
@@ -3547,6 +3549,33 @@ export class AppStore extends TypedBaseStore<IAppState> {
     account: IGitAccount | null,
     options?: PushOptions
   ): Promise<void> {
+    const {
+      changesState: { workingDirectory },
+    } = this.repositoryStateCache.get(repository)
+
+    // Check if push breaks GitHub's 100 MB file limit.
+    if (repository.gitHubRepository !== null) {
+      const overSizedFiles = await getLargeFilePaths(
+        repository,
+        workingDirectory,
+        100
+      )
+      const filesIgnoredByLFS = await filesNotTrackedByLFS(
+        repository,
+        overSizedFiles
+      )
+
+      if (filesIgnoredByLFS.length > 0) {
+        this._showPopup({
+          type: PopupType.ShowOverSizedFiles,
+          // repository,
+          oversizedFilePaths: filesIgnoredByLFS,
+        })
+
+        return
+      }
+    }
+
     const state = this.repositoryStateCache.get(repository)
     const { remote } = state
     if (remote === null) {

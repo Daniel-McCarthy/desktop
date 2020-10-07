@@ -96,6 +96,7 @@ import { AbortMergeWarning } from './abort-merge'
 import { isConflictedFile } from '../lib/status'
 import { PopupType, Popup } from '../models/popup'
 import { OversizedFiles } from './changes/oversized-files-warning'
+import { PushingOversizedFiles } from './changes/pushing-oversized-files-warning'
 import { UsageStatsChange } from './usage-stats-change'
 import { PushNeedsPullWarning } from './push-needs-pull'
 import { RebaseFlow, ConfirmForcePush } from './rebase'
@@ -1991,6 +1992,14 @@ export class App extends React.Component<IAppProps, IAppState> {
           />
         )
       }
+      case PopupType.ShowOverSizedFiles:
+        return (
+          <PushingOversizedFiles
+            key="pushing-oversized-files"
+            oversizedFiles={popup.oversizedFilePaths}
+            onDismissed={this.onPopupDismissed}
+          />
+        )
       default:
         return assertNever(popup, `Unknown popup type: ${popup}`)
     }
