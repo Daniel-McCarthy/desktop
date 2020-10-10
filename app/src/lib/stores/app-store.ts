@@ -3568,7 +3568,6 @@ export class AppStore extends TypedBaseStore<IAppState> {
       if (filesIgnoredByLFS.length > 0) {
         this._showPopup({
           type: PopupType.ShowOverSizedFiles,
-          // repository,
           oversizedFilePaths: filesIgnoredByLFS,
         })
 
